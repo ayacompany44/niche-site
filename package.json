@@ -1,0 +1,10 @@
+{
+  "name": "niche-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NICHE® — magazine interactif des rêves (site statique + Netlify Functions + Netlify Blobs)",
+  "dependencies": {
+    "@netlify/blobs": "11.1.4"
+  }
+}

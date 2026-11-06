@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NICHE® — No dream is too niche.</title>
+<meta name="description" content="NICHE®, le magazine interactif des rêves. Raconte le tien, découvre ceux des autres.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="NICHE® — No dream is too niche.">
+<meta property="og:description" content="Le magazine interactif des rêves. Raconte le tien, découvre ceux des autres.">
+<meta property="og:type" content="website">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* Layout: magazine sombre et aéré — fond noir, accent jaune fluo, grotesk en casse normale + italique serif pour un mot par titre */
+:root{
+  --y:#E1FF00; --k:#000;
+  --ink:#EDEDE6;                 /* texte principal, blanc cassé teinté jaune */
+  --ink-2:rgba(237,237,230,.62); /* texte secondaire */
+  --ink-3:rgba(237,237,230,.28); /* texte éteint (révélation au scroll) */
+  --line:rgba(237,237,230,.12);
+  --panel:#0d0d0b;
+  --y-line:rgba(225,255,0,.3); --y-soft:rgba(225,255,0,.62); --k-line:rgba(237,237,230,.12);
+  --display:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --serif:"Instrument Serif","Times New Roman",Georgia,serif;
+  --gx:max(16px,3vw,env(safe-area-inset-left,0px));
+  --gxr:max(16px,3vw,env(safe-area-inset-right,0px));
+  --ease:cubic-bezier(.7,0,.2,1); --out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--k);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.45;overflow-x:hidden}
+::selection{background:var(--y);color:var(--k)}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--y);outline-offset:3px}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+.wrap{padding-left:var(--gx);padding-right:var(--gxr)}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;line-height:1.35}
+.it{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em}
+.dim{color:var(--ink-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.logo{display:block;width:100%;height:auto;fill:currentColor}
+.tone-k{background:var(--k);color:var(--ink)}
+
+/* header */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--k)}
+.hdr{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);z-index:50;display:flex;align-items:center;gap:clamp(16px,2.6vw,40px);height:76px;padding-left:var(--gx);padding-right:var(--gxr);background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);transition:transform .5s var(--out)}
+.hdr.hide{transform:translateY(-110%)}
+.hdr .mini{width:96px;color:var(--y);text-decoration:none;flex:none}
+.hdr .sep{width:1px;align-self:stretch;margin-block:16px;background:var(--line)}
+.hdr nav{display:flex;gap:clamp(16px,2.2vw,36px);flex:1}
+.hdr nav a,.hdr .right a:not(.pill){font-size:16px;color:var(--ink-2);text-decoration:none;transition:color .2s}
+.hdr nav a:hover,.hdr nav a[aria-current="page"],.hdr .right a:hover{color:var(--ink)}
+.hdr .right{display:flex;align-items:center;gap:clamp(14px,2vw,30px)}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:600;text-decoration:none;white-space:nowrap;transition:transform .4s var(--out),background .2s,color .2s}
+.pill.y{background:var(--y);color:var(--k)}
+.pill.y:hover{transform:translateY(-2px)}
+.pill.o{border:1px solid var(--line);color:var(--ink)}
+.pill.o:hover{border-color:var(--ink-2)}
+.hdr .pill{padding:12px 22px;font-size:16px}
+@media (max-width:760px){.hdr nav,.hdr .sep,.hdr .right .opt{display:none}.hdr{justify-content:space-between;height:64px}.hdr .mini{width:80px}.hdr .pill{padding:10px 14px;font-size:13px}}
+
+/* lettres */
+.split .w{display:inline-block;white-space:nowrap}
+.split .ch{display:inline-block}
+.reveal .ch{animation:rise .85s var(--out) both;animation-delay:calc(var(--i) * 22ms + var(--d,0ms))}
+@keyframes rise{from{transform:translateY(60%);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== 1. HERO : anneau de rêves ===== */
+.hero{position:relative;min-height:max(640px,100svh);display:grid;place-items:center;overflow:hidden;padding-top:76px}
+.ring-wrap{position:absolute;inset:0;perspective:1500px;perspective-origin:50% 40%;pointer-events:none}
+.ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.rc{position:absolute;left:calc(var(--w) / -2);top:calc(var(--h) / -2);width:var(--w);height:var(--h);overflow:hidden;border-radius:4px;backface-visibility:visible;display:flex;flex-direction:column;justify-content:space-between;padding:10px;font-weight:800;line-height:.9;letter-spacing:-.03em;pointer-events:auto;text-decoration:none}
+.rc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rc .t{position:relative;font-size:var(--fs,18px);overflow-wrap:anywhere}
+.rc .m{position:relative;font-family:var(--mono);font-weight:400;font-size:8px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.rc.v0{background:var(--y);color:var(--k)}
+.rc.v1{background:#f2f0ea;color:var(--k)}
+.rc.v1 .t{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em;line-height:.95}
+.rc.v2{background:#151513;color:var(--y);border:1px solid var(--y-line)}
+.rc.v2 .t{color:transparent;-webkit-text-stroke:1px var(--y)}
+.rc.v3{background:repeating-linear-gradient(0deg,var(--y) 0 3px,var(--k) 3px 7px);color:var(--k)}
+.rc.v3 .t{background:var(--y);align-self:flex-start;padding:2px 4px}
+.rc.v4{background:#2a2a26;color:var(--ink)}
+.hero-c::before{content:"";position:absolute;inset:-12% -18%;z-index:-1;background:radial-gradient(closest-side,rgba(0,0,0,.82),rgba(0,0,0,.55) 60%,transparent);pointer-events:none}
+.hero-c{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;padding-inline:var(--gx) var(--gxr)}
+.hero h1{margin:0;font-weight:700;font-size:clamp(52px,9.4vw,168px);line-height:.92;letter-spacing:-.045em;color:var(--ink)}
+.sel{position:relative;display:inline-block;margin-top:.06em;padding:.02em .16em .06em;border:1.5px solid var(--y)}
+.sel i{position:absolute;width:9px;height:9px;background:var(--k);border:1.5px solid var(--y)}
+.sel i:nth-child(1){left:-5px;top:-5px}.sel i:nth-child(2){right:-5px;top:-5px}.sel i:nth-child(3){left:-5px;bottom:-5px}.sel i:nth-child(4){right:-5px;bottom:-5px;background:var(--y)}
+.stripe{color:transparent;background:repeating-linear-gradient(180deg,var(--y) 0 .055em,transparent .055em .11em);-webkit-background-clip:text;background-clip:text;font-variation-settings:"wdth" 112;font-weight:400}
+.hero .lede{margin:clamp(28px,3vw,44px) 0 0;font-size:clamp(17px,1.6vw,24px);color:var(--ink);max-width:36ch;text-shadow:0 0 30px #000}
+.hero .ctas{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:clamp(28px,3vw,44px)}
+.hero .ctas .pill{font-size:clamp(17px,1.4vw,21px);padding:20px clamp(28px,3vw,44px);background-clip:padding-box}
+.hero .ctas .pill.o{background:rgba(0,0,0,.7)}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:30%;background:linear-gradient(transparent,var(--k));z-index:1;pointer-events:none}
+
+/* ===== 2. Phrase révélée au scroll ===== */
+.statement{min-height:110svh;display:grid;place-items:center;padding-block:clamp(90px,12vw,180px)}
+.statement p{margin:0;max-width:22ch;text-align:center;font-weight:600;font-size:clamp(30px,4.4vw,74px);line-height:1.08;letter-spacing:-.035em;text-wrap:balance}
+.statement .wd{color:var(--ink-3);transition:color .35s}
+.statement .wd.on{color:var(--ink)}
+.statement .wd.it.on{color:var(--y)}
+
+/* ===== 3. Trois cartes ===== */
+.made{padding-block:clamp(70px,9vw,140px)}
+.big-h{margin:0;font-weight:600;font-size:clamp(46px,7.6vw,140px);line-height:.95;letter-spacing:-.045em;max-width:14ch}
+.big-h .it{color:var(--y)}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.2vw,36px);margin-top:clamp(50px,7vw,110px)}
+.c3{position:relative;border-radius:20px;border:1px solid var(--line);background:linear-gradient(160deg,#1a1a17 0%,var(--panel) 45%,#050505 100%);padding:clamp(24px,2.4vw,44px);display:flex;flex-direction:column;gap:18px;min-height:clamp(520px,44vw,680px);overflow:hidden;min-width:0}
+.c3 h3{margin:0;font-weight:600;font-size:clamp(22px,1.8vw,32px);line-height:1.15;letter-spacing:-.02em}
+.c3 h3 span{color:var(--ink-2)}
+.c3 p{margin:0;color:var(--ink-2);font-size:clamp(15px,1.15vw,19px);line-height:1.45}
+.c3 .lnk{color:var(--ink);text-decoration:none;font-size:clamp(15px,1.1vw,18px)}
+.c3 .lnk:hover{color:var(--y)}
+.c3 .vis{margin-top:auto;position:relative;display:grid;place-items:center;min-height:240px}
+@media (max-width:900px){.cards3{grid-template-columns:1fr}.c3{min-height:0}}
+/* carte 1 : aperçu du formulaire */
+.mock{width:min(100%,360px);background:#f4f3ee;color:#111;border-radius:12px;padding:18px 20px;box-shadow:0 30px 60px rgba(0,0,0,.6);transform:translateY(30px)}
+.mock .top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.1);padding-bottom:12px;font-size:14px;font-weight:600}
+.mock .top b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;background:var(--k);color:var(--y);font-size:12px;margin-right:8px}
+.mock .sum{margin:14px 0 10px;font-size:15px}
+.mock .sum span{color:rgba(0,0,0,.5)}
+.mock .row{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px}
+.mock .row strong{display:flex;align-items:center;gap:8px;font-weight:600}
+.mock .row strong::before{content:"";width:7px;height:7px;border-radius:50%;background:#7a9900}
+.mock .row span{color:rgba(0,0,0,.5);text-align:right}
+/* carte 2 : typo qui respire */
+.morph{display:flex;flex-direction:column;align-items:center;line-height:.82;font-size:clamp(70px,7.4vw,120px);color:var(--ink);font-weight:400}
+.morph span{display:block;animation:breathe 3.2s ease-in-out infinite alternate}
+.morph span:nth-child(2){animation-delay:-1.6s;color:var(--y)}
+@keyframes breathe{from{font-variation-settings:"wdth" 62,"wght" 200}to{font-variation-settings:"wdth" 125,"wght" 800}}
+/* carte 3 : sphère de mots */
+#sphere{width:100%;max-width:380px;aspect-ratio:1}
+
+/* ===== 4. Rangée de rêves ===== */
+.apart{padding-block:clamp(70px,9vw,140px) clamp(80px,10vw,160px)}
+.apart .intro p{margin:clamp(24px,3vw,40px) 0 0;color:var(--ink-2);font-size:clamp(17px,1.4vw,22px);max-width:48ch}
+.ulink{display:inline-flex;gap:8px;margin-top:22px;font-size:clamp(17px,1.3vw,20px);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:4px}
+.ulink:hover{color:var(--y)}
+.rail{display:flex;gap:clamp(14px,1.8vw,28px);overflow-x:auto;scroll-snap-type:x proximity;padding:clamp(50px,6vw,90px) var(--gxr) 20px var(--gx);scrollbar-width:none;cursor:grab}
+.rail::-webkit-scrollbar{display:none}
+.rail.drag{cursor:grabbing;scroll-snap-type:none}
+.rd{flex:0 0 var(--w,440px);height:clamp(380px,36vw,520px);border-radius:12px;overflow:hidden;position:relative;scroll-snap-align:start;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,2vw,30px);transition:transform .6s var(--out)}
+.rd:hover{transform:translateY(-6px)}
+.rd img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--out)}
+.rd:hover img{transform:scale(1.04)}
+.rd .t{position:relative;font-weight:700;font-size:clamp(30px,3vw,52px);line-height:.95;letter-spacing:-.035em;overflow-wrap:anywhere}
+.rd .m{position:relative;display:flex;justify-content:space-between;gap:10px}
+.rd.v0{background:var(--y);color:var(--k)}
+.rd.v1{background:#f2f0ea;color:var(--k)}
+.rd.v1 .t{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(34px,3.4vw,60px);letter-spacing:-.01em;line-height:1}
+.rd.v2{background:#121210;color:var(--ink);border:1px solid var(--line)}
+.rd.v2 .t{color:var(--y)}
+.rd.v3{background:repeating-linear-gradient(0deg,var(--y) 0 4px,var(--k) 4px 10px);color:var(--k)}
+.rd.v3 .t,.rd.v3 .m{background:var(--y);align-self:flex-start;padding:4px 8px}
+.rd.ph{color:#fff}
+.rd.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 40%,rgba(0,0,0,.55))}
+.rd.ph .t,.rd.ph .m{z-index:1}
+@media (max-width:640px){.rd{flex-basis:82vw!important}}
+
+/* ===== archive ===== */
+.arch{padding-top:calc(130px + env(safe-area-inset-top,0px));padding-bottom:clamp(70px,9vw,140px)}
+.arch h1{margin:0;font-weight:600;font-size:clamp(52px,9vw,170px);line-height:.92;letter-spacing:-.045em}
+.arch h1 .it{color:var(--y)}
+.bar{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:clamp(30px,4vw,60px)}
+.search{flex:1 1 280px;display:flex;align-items:center;border-bottom:1px solid var(--ink-2);min-width:0}
+.search input{flex:1;min-width:0;background:none;border:0;padding:12px 0;font-weight:500;font-size:clamp(20px,1.8vw,26px);outline:none}
+.search input::placeholder{color:var(--ink-3)}
+.sort{color:var(--ink-2);font-size:15px}
+.sort:hover{color:var(--ink)}
+.bar .pill{padding:14px 24px;font-size:16px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chip{font-size:14px;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:8px 14px;transition:color .2s,border-color .2s,background .2s}
+.chip:hover{color:var(--ink);border-color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--k);border-color:var(--ink)}
+.idx{list-style:none;margin:30px 0 0;padding:0;border-top:1px solid var(--line)}
+.idx li{border-bottom:1px solid var(--line)}
+.idx a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:baseline;padding:clamp(16px,1.6vw,24px) 0;text-decoration:none;transition:padding .45s var(--out),color .2s}
+.idx a:hover{padding-left:14px;color:var(--y)}
+.idx .t{font-weight:600;letter-spacing:-.03em;line-height:1;font-size:clamp(24px,3vw,50px);overflow-wrap:anywhere}
+.idx .r{text-align:right;display:flex;flex-direction:column;gap:4px;color:var(--ink-2)}
+@media (max-width:640px){.idx .r{display:none}}
+.peek{position:fixed;left:0;top:0;z-index:40;width:min(24vw,280px);aspect-ratio:4/5;pointer-events:none;opacity:0;transform:translate(-50%,-50%) scale(.9) rotate(-2deg);transition:opacity .2s,transform .35s var(--out);overflow:hidden;border-radius:8px;background:#111}
+.peek.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-2deg)}
+.peek img{width:100%;height:100%;object-fit:cover}
+@media (pointer:coarse){.peek{display:none}}
+.empty{border-top:1px solid var(--line);padding-top:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.empty h3{margin:0;font-weight:600;font-size:clamp(28px,3.4vw,54px);line-height:1;letter-spacing:-.03em}
+.empty p{margin:0;max-width:52ch;color:var(--ink-2)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:15px;padding:12px 20px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);transition:border-color .2s,background .2s,color .2s}
+.btn:hover{border-color:var(--ink-2)}
+.btn.solid{background:var(--y);color:var(--k);border-color:var(--y)}
+.btn[disabled]{opacity:.45;cursor:progress}
+
+/* ===== page rêve ===== */
+.dream{padding-top:calc(120px + env(safe-area-inset-top,0px));padding-bottom:clamp(60px,8vw,120px)}
+.dream .top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;color:var(--ink-2)}
+.dream .top a{text-decoration:none}
+.dream .top a:hover{color:var(--ink)}
+.dream h1{margin:clamp(30px,4vw,64px) 0 0;font-weight:600;font-size:clamp(44px,7.4vw,140px);line-height:.95;letter-spacing:-.045em;max-width:16ch;overflow-wrap:anywhere}
+.dream .who{margin-top:clamp(18px,2.4vw,32px);display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+.dream .who > span:first-child{font-family:var(--serif);font-style:italic;font-size:clamp(24px,2.3vw,36px);line-height:1;color:var(--y)}
+.badge{display:inline-block;border:1px solid currentColor;padding:2px 7px;border-radius:999px}
+.photos{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(10px,1.4vw,20px);margin-top:clamp(36px,5vw,80px)}
+.photos button{display:block;overflow:hidden;background:#111;min-width:0;cursor:zoom-in;border-radius:10px}
+.photos img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--out)}
+.photos button:hover img{transform:scale(1.03)}
+.photos button:nth-child(1){grid-column:1/-1;aspect-ratio:16/8}
+.photos button:nth-child(odd):not(:first-child){grid-column:6/span 7;aspect-ratio:4/3}
+.photos button:nth-child(even){grid-column:1/span 5;aspect-ratio:4/5}
+@media (max-width:700px){.photos button{grid-column:1/-1!important;aspect-ratio:4/3!important}}
+.story{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;margin-top:clamp(40px,6vw,100px)}
+.story .side{grid-column:1/span 3;display:flex;flex-direction:column;gap:12px;align-items:flex-start;color:var(--ink-2)}
+.story .txt{grid-column:5/span 7;min-width:0}
+.story .txt p{margin:0 0 1em;font-size:clamp(18px,1.4vw,22px);line-height:1.6;max-width:62ch;overflow-wrap:anywhere}
+.story .txt p:first-child{font-size:clamp(22px,1.9vw,30px);line-height:1.35;letter-spacing:-.01em}
+@media (max-width:820px){.story .side,.story .txt{grid-column:1/-1}}
+.more{margin-top:clamp(70px,9vw,140px)}
+.sim{list-style:none;margin:14px 0 0;padding:0}
+.sim li{border-top:1px solid var(--line)}
+.sim a{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:18px 0;text-decoration:none;transition:color .2s}
+.sim a:hover{color:var(--y)}
+.sim .t{font-weight:600;font-size:clamp(20px,2.2vw,34px);line-height:1.05;letter-spacing:-.025em;overflow-wrap:anywhere}
+.pn{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);margin-top:clamp(30px,4vw,60px)}
+.pn a{padding:clamp(18px,2.4vw,30px) 0;text-decoration:none;display:flex;flex-direction:column;gap:8px;min-width:0;color:var(--ink-2)}
+.pn a:hover .t{color:var(--y)}
+.pn a:first-child{padding-right:16px}
+.pn a+a{text-align:right;border-left:1px solid var(--line);padding-left:16px}
+.pn .t{color:var(--ink);font-weight:600;font-size:clamp(18px,2.2vw,36px);line-height:1.05;letter-spacing:-.025em;overflow-wrap:anywhere;transition:color .2s}
+.lb{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.95);display:grid;place-items:center;padding:calc(56px + env(safe-area-inset-top,0px)) var(--gxr) calc(56px + env(safe-area-inset-bottom,0px)) var(--gx)}
+.lb img{max-height:100%;max-width:100%;object-fit:contain}
+.lb .x{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:var(--gxr);color:var(--y)}
+.lb .nav{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:0;right:0;display:flex;justify-content:center;gap:16px;color:var(--y)}
+
+/* ===== formulaire ===== */
+.share{position:fixed;inset:0;z-index:80;background:var(--k);color:var(--ink);overflow-y:auto;overscroll-behavior:contain}
+.share.enter{animation:sheet .75s var(--ease) both}
+@keyframes sheet{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0)}}
+.share .bar2{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:calc(18px + env(safe-area-inset-top,0px)) 18px;background:rgba(0,0,0,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.share .bar2 .mini{width:90px;color:var(--y)}
+.share .prog{flex:1;height:2px;background:var(--line);max-width:360px;border-radius:2px}
+.share .prog i{display:block;height:100%;background:var(--y);transform-origin:left;transform:scaleX(var(--p,0));transition:transform .5s var(--out)}
+#closeShare{color:var(--ink-2)}
+#closeShare:hover{color:var(--ink)}
+.share .intro{padding-block:clamp(50px,7vw,110px) clamp(30px,4vw,60px)}
+.share .intro h2{margin:0;font-weight:600;font-size:clamp(44px,7.6vw,140px);line-height:.95;letter-spacing:-.045em;max-width:13ch}
+.share .intro p{margin:clamp(20px,3vw,36px) 0 0;font-family:var(--serif);font-style:italic;font-size:clamp(22px,2.2vw,36px);line-height:1.15;max-width:32ch;color:var(--ink-2)}
+.step{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px 20px;padding-block:clamp(28px,3.6vw,54px);border-top:1px solid var(--line)}
+.step .lab{grid-column:1/span 4;display:flex;flex-direction:column;gap:8px}
+.step .lab .mono{color:var(--y)}
+.step .lab h3{margin:0;font-weight:600;font-size:clamp(22px,2vw,34px);line-height:1.05;letter-spacing:-.02em}
+.step .lab .hint{color:var(--ink-2);font-size:14px;max-width:34ch}
+.step .fld{grid-column:6/span 7;min-width:0;display:flex;flex-direction:column;gap:12px}
+@media (max-width:820px){.step .lab,.step .fld{grid-column:1/-1}}
+.share input[type=text],.share textarea{width:100%;background:transparent;border:0;border-bottom:1px solid var(--ink-2);padding:12px 0;outline:none;border-radius:0;transition:border-color .2s}
+.share input[type=text]:focus,.share textarea:focus{border-color:var(--y)}
+.share input[type=text]{font-weight:600;font-size:clamp(24px,2.8vw,46px);line-height:1.1;letter-spacing:-.025em}
+.share input.small{font-size:clamp(20px,1.8vw,28px)}
+.share textarea{font-size:clamp(17px,1.3vw,20px);line-height:1.55;min-height:240px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel)}
+.share ::placeholder{color:var(--ink-3)}
+.counter{display:flex;justify-content:space-between;gap:10px;color:var(--ink-2)}
+.err{color:var(--k);background:var(--y);padding:4px 10px;border-radius:999px;font-family:var(--mono);font-size:12px;letter-spacing:.02em;align-self:flex-start}
+.drop{border:1px dashed var(--ink-2);border-radius:14px;padding:clamp(22px,3vw,40px);display:flex;flex-direction:column;gap:12px;align-items:flex-start;transition:background .2s,border-color .2s}
+.drop.over{border-color:var(--y);background:rgba(225,255,0,.06)}
+.drop strong{font-weight:600;font-size:clamp(18px,1.6vw,24px)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.thumb{position:relative;aspect-ratio:1;overflow:hidden;background:#111;border-radius:10px}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .rm{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:var(--y);color:var(--k);font-weight:900;font-size:15px;line-height:1}
+.thumb .ld{position:absolute;inset:0;display:grid;place-items:center}
+.cats{display:flex;flex-wrap:wrap;gap:8px}
+.cats label{cursor:pointer}
+.cats input{position:absolute;opacity:0;pointer-events:none}
+.cats span{display:inline-block;font-size:clamp(15px,1.2vw,18px);border:1px solid var(--line);border-radius:999px;padding:10px 16px;color:var(--ink-2);transition:background .2s,color .2s,border-color .2s}
+.cats label:hover span{color:var(--ink);border-color:var(--ink-2)}
+.cats input:checked+span{background:var(--y);color:var(--k);border-color:var(--y)}
+.cats input:focus-visible+span{outline:2px solid var(--y);outline-offset:3px}
+.switch{display:flex;align-items:center;gap:14px;cursor:pointer}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.switch .tr{width:56px;height:30px;border:1px solid var(--ink-2);border-radius:999px;position:relative;flex:none;transition:background .3s,border-color .3s}
+.switch .tr::after{content:"";position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:transform .35s var(--out),background .3s}
+.switch input:checked+.tr{background:var(--y);border-color:var(--y)}
+.switch input:checked+.tr::after{transform:translateX(26px);background:var(--k)}
+.switch input:focus-visible+.tr{outline:2px solid var(--y);outline-offset:3px}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;max-width:70ch;color:var(--ink-2)}
+.check input{appearance:none;-webkit-appearance:none;width:22px;height:22px;border:1px solid var(--ink-2);border-radius:6px;flex:none;margin:1px 0 0;display:grid;place-items:center;cursor:pointer}
+.check input:checked{background:var(--y);border-color:var(--y)}
+.check input:checked::after{content:"";width:10px;height:5px;border-left:2.5px solid var(--k);border-bottom:2.5px solid var(--k);transform:translateY(-2px) rotate(-45deg)}
+.check a{color:var(--ink)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.send-row{padding-block:clamp(30px,5vw,64px) calc(clamp(40px,6vw,100px) + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.send{font-weight:600;font-size:clamp(20px,2vw,28px);background:var(--y);color:var(--k);padding:22px 40px;border-radius:999px;transition:transform .4s var(--out)}
+.send:hover{transform:translateY(-2px)}
+.send[disabled]{opacity:.5;cursor:progress}
+.send-row .mono{color:var(--ink-2)}
+.done-box{min-height:calc(100% - 90px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(18px,3vw,36px);padding-block:40px calc(60px + env(safe-area-inset-bottom,0px))}
+.done-box h2{margin:0;font-weight:600;font-size:clamp(48px,8.4vw,160px);line-height:.95;letter-spacing:-.045em;max-width:12ch}
+.done-box h2 .it{color:var(--y)}
+.done-box p{margin:0;font-family:var(--serif);font-style:italic;font-size:clamp(24px,2.5vw,42px);line-height:1.1;max-width:26ch;color:var(--ink-2)}
+.done-box .slogan{color:var(--y);font-weight:600;font-size:clamp(16px,1.4vw,20px)}
+
+/* ===== pages texte ===== */
+.doc{padding-top:calc(130px + env(safe-area-inset-top,0px));padding-bottom:clamp(60px,8vw,120px)}
+.doc h1{margin:0 0 clamp(30px,4vw,60px);font-weight:600;font-size:clamp(42px,6.4vw,120px);line-height:.95;letter-spacing:-.045em}
+.doc .prose{max-width:68ch;margin-left:auto;margin-right:clamp(0px,8vw,160px)}
+.doc h2{font-weight:600;font-size:clamp(20px,1.6vw,26px);margin:2em 0 .5em;line-height:1.1;letter-spacing:-.015em}
+.doc h2:first-child{margin-top:0}
+.doc p,.doc li{font-size:17px;line-height:1.6;color:var(--ink-2)}
+.doc ul{padding-left:1.1em}
+.doc strong{color:var(--ink)}
+.doc > .mono{color:var(--ink-2)}
+.login{display:flex;gap:12px;flex-wrap:wrap;align-items:center;max-width:620px}
+.login input{flex:1 1 220px;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--ink-2);padding:12px 0;font-size:22px;outline:none}
+.mod-item{border-top:1px solid var(--line);padding-block:24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px}
+.mod-item h3{margin:6px 0 10px;font-weight:600;font-size:clamp(22px,2.4vw,38px);line-height:1.05;letter-spacing:-.025em;overflow-wrap:anywhere}
+.mod-item .st{white-space:pre-line;max-width:70ch;margin:0 0 12px;overflow-wrap:anywhere;color:var(--ink-2)}
+.mod-item .acts{display:flex;flex-direction:column;gap:8px;min-width:190px}
+.mod-item .pics{display:flex;gap:8px;flex-wrap:wrap}
+.mod-item .pics img{width:110px;height:110px;object-fit:cover;border-radius:8px}
+.mod-item .kv{display:flex;gap:16px;flex-wrap:wrap;color:var(--ink-2)}
+@media (max-width:700px){.mod-item{grid-template-columns:1fr}.mod-item .acts{min-width:0}}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+
+/* footer */
+.foot{padding-top:clamp(60px,8vw,120px);padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.foot .cta-end{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(60px,9vw,140px)}
+.foot .cta-end h2{margin:0;font-weight:600;font-size:clamp(36px,5vw,90px);line-height:.98;letter-spacing:-.04em;max-width:14ch}
+.foot .cta-end h2 .it{color:var(--y)}
+.foot .cta-end .pill{padding:20px 36px;font-size:clamp(17px,1.3vw,20px)}
+.foot .logo{color:var(--y)}
+.foot .base{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:18px;color:var(--ink-2)}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--ink)}
+
+/* transitions */
+.wipe{position:fixed;inset:0;z-index:100;background:var(--y);display:grid;place-items:center;transform:translateY(100%);pointer-events:none}
+.wipe svg{width:min(38vw,320px);fill:var(--k)}
+.shuffle{position:fixed;inset:0;z-index:95;background:var(--k);color:var(--ink);display:flex;flex-direction:column;justify-content:center;gap:20px;padding-left:var(--gx);padding-right:var(--gxr)}
+.shuffle .mono{color:var(--y)}
+.shuffle .t{font-weight:600;font-size:clamp(38px,6.6vw,120px);line-height:.95;letter-spacing:-.04em;overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom,0px));z-index:130;transform:translate(-50%,16px);opacity:0;background:var(--y);color:var(--k);padding:12px 18px;border-radius:999px;font-weight:600;transition:opacity .3s,transform .4s var(--out);pointer-events:none;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 1037 305"><path fill-rule="evenodd" d="M422.0 303.9C417.8 303.8 414.2 303.7 414.0 303.6C413.9 303.6 411.8 303.3 409.4 303.1C407.0 302.9 404.7 302.6 404.3 302.5C403.9 302.3 402.6 302.1 401.5 302.0C400.3 301.8 398.7 301.5 397.9 301.3C397.1 301.1 396.2 301.0 395.8 301.0C395.4 301.0 394.3 300.7 393.4 300.5C392.6 300.2 391.3 299.9 390.6 299.8C388.4 299.3 382.1 297.6 381.7 297.3C381.5 297.2 380.8 297.0 380.1 296.8C378.7 296.5 377.0 295.9 375.8 295.3C375.4 295.1 374.8 295.0 374.5 295.0C374.3 295.0 373.7 294.7 373.3 294.5C372.9 294.2 372.2 294.0 371.8 293.9C371.4 293.7 370.3 293.3 369.4 292.8C368.4 292.3 367.5 292.0 367.3 291.9C367.0 291.9 366.5 291.7 366.2 291.5C365.9 291.2 365.4 291.0 365.2 291.0C365.0 290.9 364.5 290.7 364.2 290.5C363.9 290.2 363.4 290.0 363.2 290.0C363.0 289.9 362.5 289.7 362.2 289.5C361.9 289.2 361.4 289.0 361.2 289.0C361.0 288.9 360.5 288.7 360.2 288.5C359.9 288.2 359.4 288.0 359.2 288.0C359.0 288.0 358.7 287.8 358.5 287.6C358.3 287.4 357.3 286.9 356.5 286.4C355.6 286.0 354.3 285.2 353.7 284.8C353.0 284.3 352.4 284.0 352.4 284.0C352.3 284.0 351.7 283.6 351.2 283.2C350.6 282.8 349.2 281.8 348.1 281.1C344.8 278.8 343.6 277.9 342.5 277.0C342.0 276.6 340.6 275.4 339.4 274.5C338.2 273.5 336.9 272.4 336.4 271.9C336.0 271.5 335.0 270.6 334.1 269.9C332.2 268.3 329.3 265.4 326.1 261.8C324.7 260.3 323.5 259.0 323.3 258.8C323.0 258.6 317.8 251.9 316.0 249.5C314.7 247.8 313.5 246.0 312.5 244.3C312.0 243.6 311.5 242.9 311.3 242.7C311.1 242.5 311.0 242.2 311.0 242.0C311.0 241.7 310.8 241.4 310.6 241.2C310.4 241.0 310.0 240.6 309.8 240.2C309.6 239.8 309.3 239.1 309.1 238.7C308.9 238.3 308.5 237.9 308.3 237.7C308.1 237.5 308.0 237.2 308.0 237.0C308.0 236.8 307.7 236.4 307.5 236.0C307.2 235.6 306.9 235.1 306.9 234.8C306.8 234.5 306.5 234.1 306.3 233.9C306.1 233.8 306.0 233.5 306.0 233.3C306.0 233.0 305.8 232.7 305.6 232.5C305.3 232.1 304.5 230.5 303.5 228.5C303.3 227.8 302.8 226.8 302.5 226.2C302.2 225.5 302.0 224.9 301.9 224.8C301.9 224.7 301.7 224.3 301.5 224.0C301.2 223.6 301.0 223.1 301.0 222.9C301.0 222.6 300.7 222.0 300.5 221.5C300.0 220.6 298.4 216.7 297.7 214.7C297.0 212.8 296.9 212.3 296.4 211.1C296.2 210.4 295.9 209.4 295.7 209.0C294.8 206.2 292.7 198.9 292.2 196.3C292.0 195.6 291.7 194.4 291.4 193.5C291.2 192.6 291.0 191.6 290.9 191.2C290.9 190.9 290.7 189.7 290.4 188.7C290.2 187.7 290.0 186.6 290.0 186.2C289.9 185.9 289.8 184.8 289.6 183.8C289.4 182.9 289.1 181.2 289.0 180.1C288.9 179.0 288.6 176.8 288.4 175.2C287.4 168.0 287.1 161.8 287.1 151.1C287.1 144.6 287.2 139.6 287.4 138.1C287.6 136.7 287.8 134.1 288.0 132.3C288.4 127.2 289.6 118.7 290.9 112.5C292.1 107.1 292.2 106.4 292.4 106.2C292.4 106.0 292.7 105.0 293.0 104.0C293.2 102.9 293.6 101.3 293.9 100.3C294.2 99.4 294.6 97.9 294.8 97.1C295.1 96.3 295.4 95.2 295.6 94.8C295.8 94.4 296.0 93.7 296.1 93.3C296.2 92.8 296.4 92.1 296.6 91.8C296.8 91.4 297.0 90.9 297.0 90.7C297.0 90.5 297.1 90.0 297.4 89.6C297.6 89.2 297.9 88.3 298.1 87.7C298.3 87.0 298.6 86.4 298.7 86.3C298.8 86.2 299.0 86.0 299.0 85.8C299.0 85.5 299.2 84.9 299.4 84.3C299.7 83.8 300.1 82.7 300.5 81.8C300.8 81.0 301.2 80.0 301.5 79.7C301.7 79.3 302.0 78.9 302.0 78.7C302.0 78.5 303.7 74.6 304.3 73.6C304.4 73.3 304.9 72.5 305.3 71.7C305.7 70.9 306.2 70.0 306.5 69.7C306.7 69.3 307.0 68.9 307.0 68.7C307.0 68.5 307.2 68.1 307.4 67.7C307.9 67.0 308.2 66.6 309.3 64.6C312.0 60.1 317.9 51.5 319.6 49.8C319.8 49.5 320.7 48.5 321.5 47.5C323.0 45.4 325.6 42.5 329.5 38.7C333.4 34.8 335.0 33.4 339.1 30.0C342.9 27.0 343.8 26.3 346.5 24.5C347.2 24.0 347.9 23.5 348.1 23.4C348.7 22.9 350.3 22.0 350.4 22.0C350.6 22.0 350.8 21.8 350.9 21.6C351.3 21.2 356.8 18.0 357.1 18.0C357.3 18.0 357.6 17.7 357.8 17.5C358.1 17.2 358.5 17.0 358.7 17.0C358.9 17.0 359.3 16.8 359.4 16.6C359.6 16.4 360.0 16.1 360.3 16.1C360.6 16.0 361.1 15.7 361.5 15.4C361.9 15.2 362.3 15.0 362.5 14.9C362.7 14.9 363.1 14.7 363.5 14.5C363.8 14.2 364.2 14.0 364.4 14.0C364.6 14.0 365.6 13.5 366.8 13.0C369.7 11.6 371.2 11.0 371.5 10.9C371.7 10.9 372.1 10.7 372.5 10.5C372.8 10.2 373.3 10.0 373.6 10.0C373.8 10.0 374.5 9.7 375.1 9.5C376.3 8.9 377.4 8.5 379.0 8.1C379.6 7.9 380.6 7.5 381.3 7.3C382.0 7.1 383.1 6.7 383.8 6.4C385.2 6.0 386.5 5.6 388.7 5.1C389.5 4.9 390.5 4.6 391.0 4.5C391.4 4.3 392.7 4.0 393.7 3.8C395.5 3.5 396.5 3.3 400.1 2.5C402.0 2.1 405.8 1.6 409.8 1.2C411.2 1.1 413.5 0.8 415.0 0.7C416.4 0.5 417.7 0.3 417.8 0.2C418.0 0.1 423.6 -0.0 430.9 -0.0C441.5 -0.0 443.9 0.0 445.1 0.3C445.9 0.5 448.3 0.8 450.3 1.0C452.4 1.1 454.6 1.3 455.3 1.4C456.0 1.6 457.3 1.8 458.1 1.8C458.9 1.9 460.4 2.2 461.5 2.4C462.5 2.6 464.2 2.9 465.2 3.1C468.4 3.7 474.4 5.1 477.3 6.0C478.3 6.2 479.6 6.6 480.3 6.8C481.0 7.0 481.8 7.3 482.1 7.4C482.4 7.6 483.1 7.8 483.8 8.0C484.5 8.2 485.7 8.6 486.4 8.9C487.1 9.2 488.3 9.7 489.0 9.9C489.7 10.2 490.4 10.6 490.5 10.7C490.7 10.8 491.0 11.0 491.3 11.0C491.7 11.0 493.0 11.5 494.2 12.2C494.4 12.4 494.9 12.6 495.2 12.7C495.5 12.9 496.0 13.1 496.2 13.2C496.4 13.4 496.9 13.6 497.2 13.7C497.5 13.9 498.0 14.1 498.2 14.2C498.4 14.4 498.9 14.6 499.2 14.7C499.5 14.9 500.0 15.1 500.2 15.2C500.4 15.4 500.9 15.6 501.3 15.8C501.7 16.0 502.6 16.5 503.3 16.9C504.0 17.4 504.8 17.8 505.1 17.9C505.4 18.0 505.8 18.3 505.9 18.6C506.1 18.8 506.4 19.0 506.5 19.0C506.7 19.0 508.2 19.9 508.8 20.4C509.0 20.5 509.7 21.0 510.5 21.6C513.1 23.3 516.0 25.5 516.8 26.3C517.1 26.6 517.9 27.3 518.6 27.9C522.1 30.7 528.1 36.7 531.2 40.4C532.2 41.6 533.4 42.9 533.8 43.3C534.2 43.7 534.8 44.5 535.3 45.2C535.7 45.8 536.5 46.9 537.1 47.6C539.3 50.5 543.0 56.0 543.0 56.4C543.0 56.5 543.2 56.8 543.5 57.1C543.7 57.3 544.0 57.7 544.0 58.0C544.0 58.2 544.1 58.5 544.2 58.6C544.5 58.8 547.0 63.2 547.0 63.6C547.0 63.7 547.2 64.1 547.5 64.5C547.7 64.8 547.9 65.2 548.0 65.5C548.0 65.7 548.2 66.1 548.5 66.5C548.7 66.8 548.9 67.2 549.0 67.5C549.0 67.7 549.2 68.1 549.5 68.5C549.7 68.8 549.9 69.2 549.9 69.4C550.0 69.6 550.2 70.1 550.4 70.7C550.7 71.2 551.1 72.1 551.4 72.8C551.7 73.5 552.1 74.6 552.4 75.3C554.0 79.4 554.3 80.2 554.8 82.0C555.0 82.6 555.4 83.6 555.6 84.3C555.8 85.0 556.2 86.1 556.5 86.8C556.9 88.0 557.0 88.5 557.7 91.3C557.9 91.9 558.2 93.1 558.5 94.1C559.0 96.1 559.4 97.7 559.7 99.6C559.9 100.3 560.2 101.8 560.4 103.1C561.2 106.6 562.0 112.2 561.9 113.2L561.8 114.1L545.8 114.1C531.8 114.2 529.7 114.2 529.5 113.8C529.3 113.6 529.1 112.6 528.9 111.6C528.8 110.5 528.6 109.3 528.5 108.9C528.3 108.4 528.0 107.2 527.9 106.2C527.4 103.9 526.4 99.9 525.0 95.5C524.4 93.5 523.8 91.7 522.4 88.0C521.0 84.2 519.0 79.5 517.7 77.2C517.6 77.0 517.2 76.4 516.9 75.8C516.6 75.2 516.3 74.6 516.2 74.6C516.1 74.5 516.0 74.2 516.0 74.0C516.0 73.7 515.7 73.3 515.5 73.1C515.2 72.8 515.0 72.5 515.0 72.4C515.0 72.1 512.2 67.8 511.0 66.3C510.5 65.7 509.8 64.7 509.5 64.2C509.2 63.7 508.7 63.1 508.4 62.8C508.2 62.6 507.0 61.1 505.7 59.7C503.2 56.7 499.0 52.4 497.6 51.3C497.0 50.9 496.1 50.2 495.5 49.6C493.9 48.3 493.7 48.2 492.7 47.5C492.2 47.1 491.3 46.5 490.7 46.1C489.2 45.0 488.5 44.5 487.4 44.0C486.9 43.7 486.4 43.3 486.3 43.2C486.2 43.1 486.0 43.0 485.7 43.0C485.5 43.0 485.1 42.7 484.8 42.5C484.6 42.2 484.3 42.0 484.1 41.9C484.0 41.9 483.5 41.7 483.2 41.5C482.9 41.2 482.4 41.0 482.2 41.0C482.0 40.9 481.5 40.7 481.2 40.5C480.9 40.2 480.4 40.0 480.2 40.0C480.1 40.0 479.6 39.7 479.2 39.5C478.9 39.2 478.2 38.9 477.8 38.8C477.4 38.7 476.3 38.3 475.4 37.8C474.4 37.3 473.5 37.0 473.2 37.0C472.9 37.0 472.7 36.8 472.6 36.7C472.5 36.6 471.8 36.3 471.0 36.1C470.2 35.8 469.5 35.5 469.3 35.4C469.2 35.3 468.5 35.1 467.7 34.9C467.0 34.8 466.1 34.5 465.7 34.3C465.4 34.1 464.9 34.0 464.7 34.0C464.5 34.0 463.6 33.7 462.7 33.5C459.3 32.5 453.6 31.5 446.0 30.6C441.7 30.0 425.0 29.8 420.8 30.2C419.3 30.3 416.8 30.6 415.3 30.7C411.0 31.1 403.3 32.5 400.2 33.4C399.4 33.6 398.4 33.9 397.8 34.0C397.3 34.1 396.3 34.3 395.6 34.6C392.7 35.5 392.0 35.8 391.1 36.0C390.6 36.1 389.9 36.4 389.6 36.6C389.3 36.8 388.9 37.0 388.7 37.0C388.3 37.0 385.8 37.9 384.7 38.6C384.3 38.8 383.8 39.0 383.5 39.0C383.3 39.0 382.8 39.2 382.5 39.5C382.1 39.7 381.7 39.9 381.5 40.0C381.2 40.0 380.8 40.2 380.5 40.5C380.1 40.7 379.6 40.9 379.4 40.9C379.2 41.0 378.9 41.0 378.9 41.2C378.8 41.3 377.9 41.8 376.9 42.3C375.8 42.8 374.8 43.4 374.7 43.6C374.5 43.8 374.2 44.0 374.0 44.0C373.8 44.0 373.3 44.2 373.0 44.5C372.6 44.8 371.7 45.4 371.1 45.8C362.9 50.9 353.8 58.9 347.9 65.9C346.7 67.4 345.6 68.7 345.4 69.0C345.2 69.2 344.5 70.1 343.9 71.0C343.2 71.8 342.6 72.7 342.4 72.9C341.9 73.6 340.1 76.3 339.3 77.6C338.9 78.3 338.5 78.9 338.5 79.0C338.2 79.2 335.9 83.3 334.7 85.7C334.6 86.0 334.3 86.4 334.2 86.7C334.1 87.0 333.8 87.4 333.7 87.7C333.6 88.0 333.3 88.4 333.2 88.7C333.1 89.0 332.8 89.4 332.7 89.7C332.6 90.0 332.4 90.4 332.2 90.6C331.6 92.0 331.0 93.4 331.0 93.7C331.0 93.9 330.8 94.3 330.5 94.7C330.3 95.0 329.9 95.7 329.8 96.2C329.6 96.7 329.3 97.7 329.0 98.5C328.7 99.2 328.3 100.3 328.1 101.0C327.9 101.6 327.5 102.4 327.4 102.8C326.8 104.0 326.4 105.2 326.0 106.8C325.9 107.7 325.6 108.6 325.4 108.8C325.1 109.5 324.6 111.5 324.0 114.1C323.7 115.2 323.4 116.2 323.4 116.5C323.3 116.7 323.0 117.7 322.8 118.8C322.6 119.9 322.2 122.0 322.0 123.3C321.7 124.7 321.2 127.6 321.0 129.7C320.7 131.8 320.4 133.8 320.3 134.2C320.1 135.2 319.5 147.4 319.5 151.3C319.5 156.9 320.1 168.7 320.6 171.3C320.8 172.5 321.0 173.9 321.0 174.4C321.0 175.6 322.4 183.4 323.4 187.2C323.6 188.1 323.8 189.3 323.9 189.8C324.0 190.4 324.3 191.4 324.6 192.2C324.8 193.0 325.2 194.3 325.4 195.2C326.4 198.5 327.7 202.5 328.6 204.8C329.5 207.0 330.9 210.5 331.5 212.0C332.0 213.0 332.1 213.4 332.7 214.4C332.8 214.6 333.3 215.6 333.7 216.5C334.1 217.4 334.6 218.2 334.7 218.3C334.8 218.4 335.0 218.7 335.0 218.9C335.0 219.1 335.2 219.6 335.5 220.0C335.7 220.3 335.9 220.7 335.9 220.9C336.0 221.9 345.9 236.7 347.5 238.0C347.7 238.2 348.5 239.1 349.2 240.0C350.8 241.9 357.2 248.3 358.5 249.3C358.9 249.6 359.9 250.4 360.5 251.0C362.2 252.5 366.6 255.9 368.9 257.5C369.2 257.7 369.9 258.1 370.3 258.4C370.7 258.7 371.2 259.0 371.3 259.0C371.5 259.0 371.8 259.1 372.0 259.4C372.2 259.6 372.5 259.9 372.8 260.0C373.1 260.1 373.9 260.6 374.6 261.0C375.3 261.4 376.2 261.9 376.6 262.1C377.0 262.3 377.5 262.5 377.7 262.7C377.9 262.8 378.4 263.0 378.7 263.2C379.0 263.3 379.5 263.6 379.7 263.7C379.9 263.8 380.6 264.1 381.3 264.4C381.9 264.7 382.9 265.2 383.5 265.5C384.1 265.7 384.7 266.0 384.8 266.0C384.9 266.0 385.5 266.2 386.1 266.4C387.1 266.9 387.9 267.2 389.5 267.7C390.0 267.9 390.7 268.2 391.1 268.3C391.5 268.5 392.5 268.9 393.3 269.1C394.2 269.3 395.6 269.7 396.6 270.0C397.5 270.3 398.9 270.6 399.6 270.8C400.3 270.9 401.6 271.2 402.4 271.5C403.3 271.7 404.2 272.0 404.4 272.0C404.7 272.0 406.1 272.2 407.6 272.4C416.0 273.9 422.5 274.3 435.1 274.1C442.8 274.0 445.2 273.9 447.9 273.5C449.7 273.2 451.6 273.0 452.1 273.0C452.6 273.0 454.1 272.7 455.4 272.4C461.3 271.2 462.7 270.9 463.8 270.6C464.4 270.4 465.4 270.1 466.0 270.0C467.1 269.7 468.7 269.2 470.8 268.4C471.4 268.2 472.1 268.0 472.4 267.9C472.6 267.9 473.1 267.7 473.5 267.5C473.8 267.2 474.3 267.0 474.6 267.0C474.9 267.0 475.4 266.7 475.8 266.5C476.3 266.2 476.9 265.9 477.2 265.8C478.3 265.5 482.4 263.5 482.6 263.2C482.7 263.1 482.9 263.0 483.2 263.0C483.4 263.0 483.8 262.7 484.1 262.5C484.3 262.2 484.6 262.0 484.8 262.0C485.1 262.0 490.3 258.9 492.6 257.3C498.5 253.1 504.8 247.1 509.2 241.4C509.7 240.8 510.2 240.2 510.4 240.0C511.3 238.9 517.0 230.6 517.0 230.3C517.0 230.3 517.4 229.5 518.0 228.5C518.5 227.6 519.0 226.8 519.0 226.6C519.0 226.5 519.2 226.0 519.5 225.7C519.7 225.4 519.9 224.9 520.0 224.7C520.0 224.5 520.2 224.0 520.5 223.7C520.7 223.4 520.9 222.9 521.0 222.7C521.0 222.5 521.2 222.0 521.5 221.7C521.7 221.4 521.9 220.9 521.9 220.7C522.0 220.5 522.2 219.9 522.5 219.3C522.7 218.8 523.0 218.2 523.0 218.1C523.0 217.9 523.2 217.4 523.4 216.9C523.7 216.3 524.0 215.6 524.1 215.1C524.2 214.7 524.4 214.2 524.5 214.1C524.6 213.9 524.8 213.3 525.0 212.6C525.1 211.9 525.4 211.2 525.5 211.1C525.6 210.9 525.8 210.2 526.1 209.3C526.3 208.5 526.7 207.0 527.0 206.1C527.3 205.1 527.7 203.7 527.8 202.9C528.0 202.1 528.2 201.2 528.3 201.0C528.8 199.9 530.3 192.2 531.0 187.1C531.2 185.2 531.6 182.6 531.8 181.3L532.1 179.1L547.7 179.0C560.4 179.0 563.4 179.0 563.7 179.3C563.8 179.5 563.9 180.2 563.7 181.6C562.7 190.5 562.5 192.0 561.4 198.0C560.7 202.1 560.5 202.9 560.0 205.2C559.7 206.4 559.3 208.0 559.1 208.9C558.9 209.8 558.7 210.7 558.6 210.9C558.5 211.1 558.2 212.1 557.9 213.1C557.1 216.1 556.7 217.6 556.5 218.1C556.3 218.4 556.1 219.1 555.9 219.7C555.8 220.3 555.6 220.9 555.5 221.1C555.4 221.2 555.2 221.7 555.1 222.1C554.9 223.1 553.5 226.8 553.2 227.1C553.1 227.2 553.0 227.5 553.0 227.7C553.0 227.9 552.7 228.5 552.5 229.1C552.2 229.6 552.0 230.2 552.0 230.3C552.0 230.6 551.0 232.7 550.3 234.1C550.1 234.4 549.8 235.1 549.4 235.8C549.1 236.5 548.8 237.3 548.6 237.6C548.5 237.9 548.2 238.5 547.9 239.0C547.7 239.5 547.3 240.0 547.2 240.1C547.1 240.2 547.0 240.4 546.9 240.7C546.9 240.9 546.7 241.4 546.5 241.7C546.2 242.0 546.0 242.5 546.0 242.6C546.0 242.8 545.6 243.6 545.1 244.3C544.6 245.1 544.1 245.9 544.0 246.1C543.9 246.4 543.4 247.2 542.9 248.0C542.4 248.8 542.0 249.5 542.0 249.6C542.0 249.7 540.7 251.7 540.4 252.0C540.4 252.0 539.9 252.7 539.4 253.5C539.0 254.2 538.4 255.0 538.2 255.2C538.0 255.5 537.4 256.2 537.0 257.0C536.5 257.7 535.8 258.6 535.5 259.0C535.1 259.3 534.2 260.5 533.5 261.5C531.4 264.2 526.4 269.4 522.2 273.3C520.5 274.9 514.0 280.1 511.7 281.8C508.6 284.0 507.8 284.5 507.0 284.8C506.6 285.0 506.2 285.3 506.1 285.4C506.0 285.6 505.6 285.8 505.2 286.1C504.8 286.3 504.1 286.6 503.7 286.8C503.3 287.0 502.9 287.4 502.7 287.6C502.5 287.8 502.2 288.0 501.9 288.0C501.7 288.0 501.4 288.1 501.3 288.2C501.2 288.4 500.8 288.7 500.4 288.9C499.9 289.1 499.0 289.6 498.3 290.0C497.6 290.4 496.9 290.8 496.7 290.8C496.0 291.1 492.4 292.7 491.0 293.4C490.4 293.7 489.7 294.0 489.5 294.0C489.3 294.0 488.9 294.1 488.8 294.2C488.5 294.5 485.7 295.6 484.3 295.9C483.9 296.0 483.2 296.3 482.7 296.5C482.2 296.7 481.0 297.1 480.1 297.4C479.1 297.7 477.6 298.2 476.8 298.5C475.9 298.7 475.0 299.0 474.7 299.0C474.5 299.0 473.6 299.2 472.8 299.5C472.0 299.7 471.1 300.0 470.8 300.0C470.5 300.0 469.7 300.1 469.1 300.3C468.5 300.5 467.4 300.8 466.5 300.9C465.7 301.0 464.1 301.3 462.8 301.6C457.1 302.6 456.1 302.8 453.9 303.0C452.6 303.1 449.7 303.3 447.5 303.5C442.5 304.0 432.6 304.2 422.0 303.9ZM0.0 152.2L0.0 6.7L20.4 6.7L40.9 6.7L41.3 7.3C41.8 7.8 42.2 8.4 43.0 10.0C43.3 10.4 43.6 11.1 43.8 11.3C44.1 11.9 46.5 16.2 47.2 17.4C48.7 20.2 50.5 23.2 50.7 23.3C50.8 23.4 51.0 23.6 51.0 23.8C51.0 24.0 51.3 24.8 51.8 25.5C52.2 26.2 53.0 27.6 53.5 28.5C54.0 29.3 54.6 30.5 54.9 31.0C55.2 31.5 55.7 32.4 56.0 32.9C56.3 33.4 56.9 34.6 57.4 35.5C57.9 36.3 58.7 37.7 59.1 38.4C59.6 39.1 60.0 39.9 60.0 40.1C60.0 40.3 60.1 40.5 60.2 40.6C60.3 40.7 61.1 41.9 62.0 43.4C63.5 46.2 63.9 46.8 64.2 47.5C64.7 48.3 66.8 52.1 67.1 52.6C67.3 52.9 67.6 53.5 67.9 54.0C68.2 54.4 68.6 55.3 69.0 55.8C69.3 56.4 69.9 57.6 70.4 58.5C70.9 59.3 71.4 60.3 71.6 60.5C71.8 60.7 72.0 61.0 72.0 61.1C72.0 61.2 72.2 61.6 72.5 62.0C72.7 62.3 72.9 62.8 72.9 63.0C73.0 63.2 73.2 63.6 73.5 63.8C73.7 64.1 74.0 64.4 74.0 64.5C74.0 64.6 74.5 65.6 75.2 66.9C75.9 68.1 76.6 69.3 76.7 69.5C76.8 69.8 77.1 70.2 77.2 70.4C77.3 70.6 78.0 71.8 78.7 73.1C79.4 74.3 80.0 75.4 80.0 75.5C80.0 75.5 80.2 75.8 80.5 76.1C80.7 76.3 81.0 76.7 81.0 76.9C81.0 77.2 81.2 77.6 81.5 78.0C81.7 78.3 81.9 78.7 81.9 78.8C82.0 78.9 82.1 79.2 82.3 79.4C82.5 79.7 83.0 80.6 83.5 81.5C84.0 82.3 84.6 83.5 85.0 84.1C85.3 84.6 85.8 85.5 86.0 86.0C86.3 86.4 86.6 87.1 86.8 87.3C86.9 87.6 87.6 88.8 88.3 90.0C88.9 91.1 89.6 92.3 89.8 92.6C89.9 92.9 90.1 93.2 90.2 93.5C90.3 93.7 91.1 95.0 91.9 96.5C93.5 99.2 93.7 99.4 94.2 100.5C94.9 101.7 95.1 102.1 95.5 102.7C95.7 103.0 96.2 103.9 96.6 104.7C97.0 105.5 97.6 106.5 98.0 107.1C98.9 108.8 99.6 110.0 100.5 111.6C100.9 112.4 101.7 113.7 102.1 114.4C102.6 115.1 103.0 115.9 103.0 116.1C103.0 116.3 103.1 116.5 103.2 116.6C103.3 116.6 104.1 117.9 105.0 119.5C105.8 121.0 106.6 122.3 106.7 122.3C106.9 122.4 107.0 122.6 107.0 122.8C107.0 123.0 107.3 123.8 107.8 124.5C108.3 125.2 109.0 126.5 109.4 127.3C110.3 128.9 111.0 130.2 112.0 131.8C112.3 132.4 112.9 133.4 113.3 134.2C113.7 135.0 114.2 135.9 114.4 136.2C114.8 136.8 115.0 137.2 115.7 138.5C116.2 139.5 116.4 139.7 118.0 142.5C118.8 143.9 119.6 145.3 119.7 145.5C119.8 145.8 120.1 146.2 120.2 146.4C120.3 146.6 121.0 147.8 121.7 149.1C122.4 150.3 123.0 151.4 123.0 151.5C123.0 151.5 123.2 151.8 123.5 152.1C123.7 152.3 124.0 152.7 124.0 152.9C124.0 153.2 124.1 153.5 124.2 153.6C124.4 153.9 125.1 154.9 126.4 157.5C126.9 158.3 127.4 159.3 127.6 159.5C127.8 159.7 128.0 160.0 128.0 160.1C128.0 160.2 128.2 160.6 128.5 161.0C128.7 161.3 128.9 161.8 128.9 162.0C129.0 162.2 129.2 162.6 129.5 162.8C129.7 163.1 130.0 163.4 130.0 163.5C130.0 163.6 130.5 164.6 131.2 165.9C131.9 167.1 132.6 168.3 132.7 168.5C132.8 168.8 133.1 169.2 133.2 169.4C133.3 169.6 134.1 171.0 134.9 172.5C136.5 175.2 136.7 175.4 137.2 176.5C137.9 177.7 138.1 178.1 138.5 178.7C138.7 179.0 139.2 179.9 139.6 180.7C140.0 181.5 140.6 182.5 141.0 183.1C141.3 183.6 141.8 184.5 142.0 185.0C142.3 185.4 142.6 186.1 142.8 186.3C143.1 186.9 145.5 191.2 146.2 192.4C147.7 195.2 149.5 198.2 149.7 198.3C149.8 198.4 150.0 198.6 150.0 198.8C150.0 199.0 150.3 199.8 150.8 200.5C151.2 201.2 152.0 202.6 152.5 203.5C153.0 204.3 153.6 205.5 153.9 206.0C154.2 206.5 154.7 207.4 155.0 207.9C155.3 208.4 155.9 209.6 156.4 210.5C156.9 211.3 157.7 212.7 158.1 213.4C158.6 214.1 159.0 214.9 159.0 215.1C159.0 215.3 159.1 215.5 159.2 215.6C159.4 215.7 161.2 218.7 162.7 221.5C163.4 222.7 165.8 227.0 166.1 227.6C166.3 227.9 166.6 228.5 166.9 229.0C167.2 229.4 167.6 230.3 168.0 230.8C168.3 231.4 168.9 232.6 169.4 233.5C169.9 234.3 170.4 235.3 170.6 235.5C170.8 235.7 171.0 236.0 171.0 236.1C171.0 236.2 171.2 236.6 171.5 237.0C171.7 237.3 171.9 237.8 171.9 238.0C172.0 238.2 172.2 238.6 172.5 238.8C172.7 239.1 173.0 239.4 173.0 239.5C173.0 239.6 173.5 240.6 174.2 241.9C174.9 243.1 175.6 244.3 175.7 244.5C175.8 244.8 176.1 245.2 176.2 245.4C176.3 245.6 177.0 246.8 177.7 248.1C178.4 249.3 179.0 250.4 179.0 250.5C179.0 250.5 179.2 250.8 179.5 251.1C179.7 251.3 180.0 251.7 180.0 251.9C180.0 252.1 180.2 252.6 180.4 252.9C181.3 254.4 181.5 254.6 181.9 255.5C182.1 256.1 182.4 256.5 182.7 256.5C183.2 256.5 183.2 252.9 183.2 131.9C183.2 35.3 183.3 7.2 183.5 7.0C183.9 6.6 211.7 6.6 212.2 7.0C212.4 7.2 212.5 39.8 212.5 152.1C212.5 283.4 212.4 297.0 212.1 297.3C211.7 297.7 209.5 297.7 191.7 297.7L171.7 297.7L171.0 297.0C170.7 296.6 170.0 295.5 169.5 294.5C169.0 293.6 168.3 292.4 168.0 291.8C167.6 291.3 167.2 290.4 166.9 290.0C166.6 289.5 166.3 288.9 166.1 288.6C165.8 288.0 163.4 283.7 162.7 282.5C161.2 279.7 159.4 276.7 159.2 276.6C159.1 276.5 159.0 276.3 159.0 276.1C159.0 275.9 158.6 275.1 158.1 274.4C157.7 273.7 156.9 272.3 156.4 271.5C155.9 270.6 155.3 269.4 155.0 268.8C154.0 267.2 153.3 265.9 152.4 264.3C152.0 263.5 151.3 262.2 150.8 261.5C150.3 260.8 150.0 260.0 150.0 259.8C150.0 259.6 149.8 259.4 149.7 259.3C149.5 259.2 147.7 256.2 146.2 253.4C145.5 252.2 143.1 247.9 142.8 247.3C142.6 247.1 142.3 246.4 142.0 246.0C141.8 245.5 141.3 244.6 141.0 244.1C140.6 243.5 140.0 242.5 139.6 241.7C139.2 240.9 138.7 240.0 138.5 239.7C138.1 239.1 137.9 238.7 137.2 237.5C136.7 236.4 136.5 236.2 134.9 233.5C134.1 232.0 133.3 230.6 133.2 230.4C133.1 230.2 132.8 229.8 132.7 229.5C132.6 229.3 131.9 228.1 131.2 226.9C130.5 225.6 130.0 224.6 130.0 224.5C130.0 224.4 129.7 224.1 129.5 223.8C129.2 223.6 129.0 223.2 128.9 223.0C128.9 222.8 128.7 222.3 128.5 222.0C128.2 221.6 128.0 221.2 128.0 221.1C128.0 221.0 127.8 220.7 127.6 220.5C127.4 220.3 126.9 219.3 126.4 218.5C125.1 215.9 124.4 214.9 124.2 214.6C124.1 214.5 124.0 214.2 124.0 213.9C124.0 213.7 123.7 213.3 123.5 213.1C123.2 212.8 123.0 212.5 123.0 212.5C123.0 212.4 122.4 211.3 121.7 210.1C121.0 208.8 120.3 207.6 120.2 207.4C120.1 207.2 119.8 206.8 119.7 206.5C119.6 206.3 118.8 204.9 118.0 203.5C116.4 200.7 116.2 200.5 115.7 199.5C115.0 198.2 114.8 197.8 114.4 197.2C114.2 196.9 113.7 196.0 113.3 195.2C112.9 194.4 112.3 193.4 112.0 192.8C111.0 191.2 110.3 189.9 109.4 188.3C109.0 187.5 108.3 186.2 107.8 185.5C107.3 184.8 107.0 184.0 107.0 183.8C107.0 183.6 106.9 183.4 106.7 183.3C106.6 183.3 105.8 182.0 105.0 180.5C104.1 179.0 103.3 177.7 103.2 177.6C103.1 177.5 103.0 177.3 103.0 177.1C103.0 176.9 102.6 176.1 102.1 175.4C101.7 174.7 100.9 173.4 100.5 172.6C99.6 171.0 98.9 169.8 98.0 168.1C97.6 167.5 97.0 166.5 96.6 165.7C96.2 164.9 95.7 164.0 95.5 163.7C95.1 163.1 94.9 162.7 94.2 161.5C93.7 160.4 93.5 160.2 91.9 157.5C91.1 156.0 90.3 154.6 90.2 154.4C89.5 153.2 87.1 148.9 86.8 148.3C86.6 148.1 86.3 147.4 86.0 147.0C85.8 146.5 85.3 145.6 85.0 145.1C84.6 144.5 84.0 143.3 83.5 142.5C83.0 141.6 82.5 140.7 82.3 140.4C82.1 140.2 82.0 139.9 81.9 139.8C81.9 139.7 81.7 139.3 81.5 139.0C81.2 138.6 81.0 138.2 81.0 137.9C81.0 137.7 80.7 137.3 80.5 137.1C80.2 136.8 80.0 136.5 80.0 136.5C80.0 136.4 79.4 135.3 78.7 134.1C78.0 132.8 77.3 131.6 77.2 131.4C77.1 131.2 76.8 130.8 76.7 130.5C76.6 130.3 75.9 129.1 75.2 127.9C74.5 126.6 74.0 125.6 74.0 125.5C74.0 125.4 73.7 125.1 73.5 124.8C73.2 124.6 73.0 124.2 72.9 124.0C72.9 123.8 72.7 123.3 72.5 123.0C72.2 122.6 72.0 122.2 72.0 122.1C72.0 122.0 71.8 121.7 71.6 121.5C71.4 121.3 70.9 120.3 70.4 119.5C69.9 118.6 69.3 117.4 69.0 116.8C68.6 116.3 68.2 115.4 67.9 115.0C67.6 114.5 67.3 113.9 67.1 113.6C66.8 113.0 64.4 108.7 63.7 107.5C62.2 104.7 60.4 101.7 60.2 101.6C60.1 101.5 60.0 101.3 60.0 101.1C60.0 100.9 59.6 100.1 59.1 99.4C58.7 98.7 57.9 97.3 57.4 96.5C56.9 95.6 56.3 94.4 56.0 93.8C55.0 92.2 54.3 90.9 53.4 89.3C53.0 88.5 52.3 87.2 51.8 86.5C51.3 85.8 51.0 85.0 51.0 84.8C51.0 84.6 50.8 84.4 50.7 84.3C50.5 84.2 48.7 81.2 47.2 78.4C46.5 77.2 44.1 72.9 43.8 72.3C43.6 72.1 43.3 71.4 43.0 71.0C42.8 70.5 42.3 69.6 42.0 69.1C41.6 68.5 41.0 67.5 40.6 66.7C40.2 65.9 39.7 65.0 39.5 64.7C39.1 64.1 38.9 63.7 38.2 62.5C37.7 61.4 37.5 61.2 35.9 58.5C35.1 57.0 34.3 55.6 34.2 55.4C33.4 53.9 31.1 49.8 30.8 49.3C30.6 49.1 30.3 48.5 30.1 48.0C29.9 47.5 29.5 47.2 29.4 47.3C29.1 47.3 29.1 74.9 29.0 172.2C29.0 264.0 28.9 297.1 28.7 297.4C28.4 297.6 25.8 297.7 14.2 297.7L0.0 297.7L0.0 152.2ZM239.3 297.4C238.9 297.0 238.8 7.1 239.2 6.8C239.7 6.5 269.5 6.7 269.9 7.0C270.1 7.2 270.2 31.6 270.2 152.0C270.2 251.3 270.1 296.9 269.9 297.2C269.7 297.7 269.3 297.7 254.6 297.7C243.2 297.7 239.5 297.6 239.3 297.4ZM581.8 297.3C581.5 297.0 581.5 283.4 581.5 152.1C581.5 30.2 581.5 7.2 581.8 7.0C582.0 6.8 586.3 6.7 597.4 6.8L612.6 6.8L612.7 72.0C612.8 107.8 612.9 137.2 613.0 137.4C613.2 137.6 629.9 137.7 695.4 137.7C766.0 137.7 777.7 137.7 778.1 137.4C778.6 137.0 778.6 136.0 778.7 71.9L778.8 6.8L794.2 6.8L809.6 6.8L809.6 151.9C809.7 259.0 809.6 297.1 809.4 297.4C809.0 297.8 779.5 297.9 779.0 297.4C778.8 297.2 778.7 282.2 778.7 231.3C778.7 180.5 778.6 165.5 778.4 165.3C778.0 164.8 613.4 164.8 613.0 165.3C612.8 165.5 612.7 180.5 612.7 231.3C612.7 282.2 612.6 297.2 612.4 297.4C612.2 297.6 608.5 297.7 597.2 297.7C583.9 297.7 582.2 297.7 581.8 297.3ZM868.0 297.4C867.8 297.2 867.7 293.7 867.7 283.5C867.7 273.2 867.6 269.7 867.4 269.5C867.2 269.3 863.4 269.2 852.0 269.2C840.5 269.2 836.7 269.1 836.5 268.9C836.0 268.4 836.1 7.4 836.5 7.0C836.8 6.8 862.9 6.7 935.7 6.8L1034.6 6.8L1034.6 20.7C1034.7 31.6 1034.6 34.6 1034.4 34.7C1034.2 34.9 996.7 34.9 951.0 35.0C900.8 35.0 867.9 35.0 867.8 35.2C867.8 35.3 867.7 58.2 867.7 86.0C867.7 122.9 867.8 136.6 868.0 136.9C868.2 137.2 880.6 137.2 942.9 137.2C984.0 137.2 1017.6 137.3 1017.8 137.4C1017.9 137.5 1017.9 143.8 1017.9 151.5L1017.8 165.3L943.1 165.4C888.4 165.4 868.3 165.5 868.0 165.7C867.8 166.0 867.7 174.6 867.7 217.6L867.7 269.2L951.7 269.2C1034.5 269.2 1035.7 269.2 1035.9 269.7C1036.1 270.0 1036.2 274.8 1036.2 283.5C1036.2 292.1 1036.1 296.9 1035.9 297.2C1035.7 297.7 1034.5 297.7 952.0 297.7C887.2 297.7 868.2 297.6 868.0 297.4Z"/></symbol></svg>
+
+<header class="hdr" id="hdr">
+  <a class="mini" href="#" aria-label="NICHE, accueil"><svg class="logo" viewBox="0 0 1037 305" role="img" aria-label="NICHE"><use href="#logo"/></svg></a>
+  <span class="sep" aria-hidden="true"></span>
+  <nav aria-label="Navigation principale">
+    <a href="#explorer" data-nav="explorer">Découvrir</a>
+    <a href="#concept" data-nav="concept">Le concept</a>
+    <a href="#archive" data-nav="archive">Archive</a>
+  </nav>
+  <div class="right">
+    <a href="#surprise" class="opt" id="hdrSurprise">Surprends-moi</a>
+    <a class="pill y" href="#partager">+ Partager mon rêve NICHE</a>
+  </div>
+</header>
+
+<main>
+<div class="view" id="v-home">
+  <!-- 1 -->
+  <section class="hero" id="top">
+    <div class="ring-wrap" aria-hidden="true"><div class="ring" id="ring"></div></div>
+    <div class="hero-c">
+      <h1><span class="split reveal" data-split style="--d:150ms">Everyone has</span><br><span class="sel"><i></i><i></i><i></i><i></i><span class="stripe">a dream.</span></span></h1>
+      <p class="lede">Certains sont étranges. Certains sont magnifiques. Tous ont leur place ici.</p>
+      <div class="ctas"><a class="pill y" href="#partager">+ Partager mon rêve NICHE</a><a class="pill o" href="#archive">Explorer l'archive</a></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="statement wrap" id="concept">
+    <p id="stmt">NICHE publie les rêves qu'on ne raconte jamais. Une petite obsession, un endroit lointain, une vie imaginée : chaque rêve est <span class="it">déjà une histoire.</span> Raconte le tien, on le lit, et il rejoint l'archive.</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="made wrap">
+    <h2 class="big-h">Fait de <span class="it">rêves,</span><br>pas de likes.</h2>
+    <div class="cards3">
+      <article class="c3">
+        <h3>Tu racontes. <span>Avec ou sans ton nom.</span></h3>
+        <p>Un titre, ton histoire, jusqu'à six photos. Ton pseudo et ton Instagram si tu veux, l'anonymat sinon.</p>
+        <a class="lnk" href="#partager">Partager mon rêve NICHE ↗</a>
+        <div class="vis">
+          <div class="mock" aria-hidden="true">
+            <div class="top"><span><b>N</b>Ton rêve pour NICHE</span><span>✕</span></div>
+            <div class="sum">1 rêve <span>· 3 photos · 1 catégorie</span></div>
+            <div class="row"><strong>Titre</strong><span>Je veux vivre au Japon</span></div>
+            <div class="row"><strong>Histoire</strong><span>842 caractères</span></div>
+            <div class="row"><strong>Catégorie</strong><span>Voyage</span></div>
+            <div class="row"><strong>Publication</strong><span>Anonyme</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="c3">
+        <h3>On lit tout. <span>Rien n'est publié sans validation.</span></h3>
+        <p>Chaque rêve est relu avant d'apparaître. Les photos d'un rêve en attente restent privées.</p>
+        <div class="vis"><div class="morph" aria-hidden="true"><span>rêve</span><span>rêve</span></div></div>
+      </article>
+      <article class="c3">
+        <h3>L'archive grandit. <span>Chaque rêve trouve sa place.</span></h3>
+        <p>Recherche, catégories, et un bouton pour tomber sur un rêve au hasard.</p>
+        <a class="lnk" href="#archive">Ouvrir l'archive ↗</a>
+        <div class="vis"><canvas id="sphere" aria-hidden="true"></canvas></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="apart" id="explorer">
+    <div class="intro wrap">
+      <h2 class="big-h">Des rêves<br><span class="it">à part</span></h2>
+      <p>Chaque rêve publié devient une page du magazine : son histoire, ses photos, et ceux qui lui ressemblent.</p>
+      <a class="ulink" href="#archive">Voir toute l'archive →</a>
+    </div>
+    <div class="rail" id="rail" aria-label="Rêves publiés"></div>
+  </section>
+</div>
+
+<div class="view" id="v-archive" hidden>
+  <section class="arch wrap">
+    <span class="mono dim" id="archCount">La bibliothèque des rêves</span>
+    <h1>The dream <span class="it">archive</span></h1>
+    <div class="bar">
+      <label class="search"><span class="sr">Rechercher un rêve</span><input id="q" type="search" placeholder="Chercher un rêve…" autocomplete="off"></label>
+      <button class="sort" id="sort" type="button">Plus récents ↓</button>
+      <button class="pill y" id="surprise" type="button">Surprends-moi</button>
+    </div>
+    <div class="filters" id="archFilters" role="group" aria-label="Filtrer par catégorie"></div>
+    <ol class="idx" id="idx"></ol>
+  </section>
+</div>
+
+<div class="view" id="v-dream" hidden><article class="dream wrap" id="dream"></article></div>
+
+<div class="view" id="v-privacy" hidden>
+  <section class="doc wrap">
+    <h1>Confidentialité</h1>
+    <div class="prose">
+      <h2>Ce que l'on collecte</h2>
+      <p>Quand tu partages un rêve, NICHE enregistre uniquement ce que tu écris dans le formulaire : le titre, ton histoire, la catégorie, tes photos et, si tu les donnes, ton nom ou pseudonyme et ton compte Instagram. Aucun compte, aucune adresse e-mail ne sont demandés.</p>
+      <h2>Pourquoi</h2>
+      <p>Ces informations servent uniquement à publier ton rêve dans le magazine NICHE, si tu l'as autorisé et après validation. Elles ne sont ni vendues, ni utilisées pour de la publicité.</p>
+      <h2>Validation</h2>
+      <p>Chaque envoi reste en attente jusqu'à sa relecture. Seuls les rêves approuvés sont visibles. Un rêve refusé est supprimé, photos comprises.</p>
+      <h2>Publication anonyme</h2>
+      <p>Si tu choisis l'anonymat, ton nom et ton Instagram ne sont jamais affichés ni copiés dans la version publiée.</p>
+      <h2>Photos</h2>
+      <ul>
+        <li>Formats acceptés : JPG, PNG, WEBP.</li>
+        <li>15 Mo maximum par photo, 6 photos maximum par rêve.</li>
+        <li>Les photos sont redimensionnées (1600 px maximum) et compressées sur ton appareil avant l'envoi.</li>
+        <li>N'envoie que des photos qui t'appartiennent, sans personne reconnaissable sans son accord.</li>
+      </ul>
+      <h2>Retrait et droits</h2>
+      <p>Tu peux demander à tout moment la modification ou la suppression de ton rêve, et exercer tes droits d'accès, de rectification et d'effacement (RGPD), en écrivant à <strong style="user-select:all" id="contactMail">ayacompany44@gmail.com</strong> avec le titre de ton rêve.</p>
+      <p style="margin-top:2em"><a class="btn solid" href="#partager">+ Partager mon rêve NICHE</a></p>
+    </div>
+  </section>
+</div>
+
+<div class="view" id="v-moderation" hidden>
+  <section class="doc wrap"><span class="mono">Espace réservé à l'équipe NICHE</span><h1>Modération</h1><div id="mod"></div></section>
+</div>
+
+</main>
+
+<footer class="foot wrap" id="foot">
+  <div class="cta-end">
+    <h2>Raconte-nous le rêve que tu <span class="it">n'as jamais raconté.</span></h2>
+    <a class="pill y" href="#partager">+ Partager mon rêve NICHE</a>
+  </div>
+  <svg class="logo" viewBox="0 0 1037 305" role="img" aria-label="NICHE"><use href="#logo"/></svg>
+  <div class="base mono"><span>NICHE® 2026 · No dream is too niche.</span><span style="display:flex;gap:20px;flex-wrap:wrap"><a href="#confidentialite">Confidentialité</a><a href="#moderation">Modération</a><a href="https://www.instagram.com/ayoub_khamassi/" target="_blank" rel="noopener">@Ayoublegraphiste</a></span></div>
+</footer>
+
+<div class="share" id="share" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="bar2 wrap">
+    <svg class="logo mini" viewBox="0 0 1037 305" aria-hidden="true"><use href="#logo"/></svg>
+    <div class="prog" aria-hidden="true"><i id="prog"></i></div>
+    <button class="mono" id="closeShare" type="button">Fermer ✕</button>
+  </div>
+  <div id="formView">
+    <section class="intro wrap">
+      <h2 id="shareTitle" class="split" data-split>On veut connaître ton rêve.</h2>
+      <p>Cette chose que tu as toujours voulu faire. Cette petite obsession que tu ne racontes jamais. Cet endroit que tu rêves de découvrir. Cette vie que tu imagines parfois.</p>
+    </section>
+    <form id="form" class="wrap" novalidate>
+      <div class="hp" aria-hidden="true"><label>Ne pas remplir <input type="text" id="f-website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="step"><div class="lab"><span class="mono">01</span><h3>Quel est ton rêve ?</h3><span class="hint">Une phrase. Commence par « Je veux… » si ça t'aide.</span></div>
+        <div class="fld"><label class="sr" for="f-title">Titre du rêve</label><input type="text" id="f-title" maxlength="110" placeholder="Je veux…" autocomplete="off"><div class="counter mono"><span class="err" id="e-title" hidden>Écris le titre de ton rêve.</span><span id="c-title" style="margin-left:auto">0 / 110</span></div></div></div>
+      <div class="step"><div class="lab"><span class="mono">02</span><h3>Raconte-nous ton histoire.</h3><span class="hint">D'où vient ce rêve, à quoi il ressemble. Autant de détails que tu veux.</span></div>
+        <div class="fld"><label class="sr" for="f-story">Ton histoire</label><textarea id="f-story" maxlength="5000" placeholder="Tout a commencé quand…"></textarea><div class="counter mono"><span class="err" id="e-story" hidden>Raconte ton rêve en quelques phrases (30 caractères minimum).</span><span id="c-story" style="margin-left:auto">0 / 5000</span></div></div></div>
+      <div class="step"><div class="lab"><span class="mono">03</span><h3>Ajoute tes photos.</h3><span class="hint">Facultatif. JPG, PNG ou WEBP, 15 Mo max par photo, 6 photos max.</span></div>
+        <div class="fld">
+          <div class="drop" id="drop"><strong>Dépose tes images ici</strong><label class="btn solid inv" style="cursor:pointer">Choisir des photos<input type="file" id="f-photos" accept="image/jpeg,image/png,image/webp" multiple class="sr"></label></div>
+          <span class="err" id="e-photos" hidden></span>
+          <div class="thumbs" id="thumbs"></div>
+        </div></div>
+      <div class="step"><div class="lab"><span class="mono">04</span><h3>Choisis une catégorie.</h3></div>
+        <div class="fld"><div class="cats" id="cats" role="radiogroup" aria-label="Catégorie"></div><span class="err" id="e-cat" hidden>Choisis une catégorie.</span></div></div>
+      <div class="step"><div class="lab"><span class="mono">05</span><h3>Ton nom ou ton pseudonyme.</h3><span class="hint">Facultatif.</span></div>
+        <div class="fld"><label class="sr" for="f-name">Nom ou pseudonyme</label><input type="text" id="f-name" class="small" maxlength="40" placeholder="Ex. Léa, ou Rêveuse du 11e"></div></div>
+      <div class="step"><div class="lab"><span class="mono">06</span><h3>Ton Instagram.</h3><span class="hint">Facultatif, sans le @.</span></div>
+        <div class="fld"><label class="sr" for="f-ig">Instagram</label><input type="text" id="f-ig" class="small" maxlength="31" placeholder="ton.compte" autocapitalize="off" spellcheck="false"><span class="err" id="e-ig" hidden>Lettres, chiffres, points et tirets bas uniquement.</span></div></div>
+      <div class="step"><div class="lab"><span class="mono">07</span><h3>Publication anonyme.</h3><span class="hint">Activée, ton nom et ton Instagram ne seront jamais affichés.</span></div>
+        <div class="fld"><label class="switch"><input type="checkbox" id="f-anon"><span class="tr" aria-hidden="true"></span><span class="mono" id="anonLbl">Mon nom sera visible</span></label></div></div>
+      <div class="step"><div class="lab"><span class="mono">✓</span><h3>Autorisations.</h3><span class="hint">Obligatoire pour publier.</span></div>
+        <div class="fld">
+          <label class="check"><input type="checkbox" id="c-text"><span>J'autorise NICHE à publier le texte de mon rêve, après validation.</span></label>
+          <label class="check" id="c-img-row"><input type="checkbox" id="c-img"><span>J'autorise NICHE à publier mes photos. Elles m'appartiennent et ne montrent personne sans son accord.</span></label>
+          <label class="check"><input type="checkbox" id="c-priv"><span>J'ai lu la <a href="#confidentialite">politique de confidentialité</a>.</span></label>
+          <span class="err" id="e-consent" hidden></span>
+        </div></div>
+      <div class="send-row">
+        <button class="send" type="submit" id="send">Envoyer mon rêve →</button>
+        <span class="err" id="e-send" hidden></span>
+        <span class="mono" style="opacity:.7">Ton rêve sera relu avant publication.</span>
+      </div>
+    </form>
+  </div>
+  <div id="doneView" hidden></div>
+</div>
+
+
+<div class="shuffle" id="shuffle" hidden aria-live="polite"><span class="mono">Un rêve au hasard…</span><div class="t" id="shuffleT"></div></div>
+<div class="wipe" id="wipe" aria-hidden="true"><svg viewBox="0 0 1037 305"><use href="#logo"/></svg></div>
+<div class="peek" id="peek" aria-hidden="true"><img alt="" id="peekImg"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/app.js" defer></script>
+</body>
+</html>
