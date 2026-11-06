@@ -65,6 +65,35 @@ export async function getIndex(s) {
   return idx;
 }
 
+/* Ajoute (ou met à jour) un rêve dans l'index public, en revérifiant après écriture
+   pour ne pas perdre un rêve si deux personnes publient au même instant. */
+export async function upsertIndex(s, dream) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const idx = await getIndex(s);
+    idx.dreams = [summary(dream), ...idx.dreams.filter((d) => d.id !== dream.id)];
+    await s.setJSON("index", idx);
+    await new Promise((r) => setTimeout(r, 120 + Math.random() * 200));
+    const check = await s.get("index", { type: "json" });
+    const mine = check?.dreams.find((d) => d.id === dream.id);
+    if (mine && mine.featured === !!dream.featured && mine.title === dream.title) return;
+  }
+}
+
+/* Remet dans l'index tout rêve publié qui n'y serait pas (filet de sécurité). */
+export async function repairIndex(s) {
+  const idx = await getIndex(s);
+  const have = new Set(idx.dreams.map((d) => d.id));
+  const { blobs } = await s.list({ prefix: "dream/" });
+  let changed = false;
+  for (const b of blobs) {
+    const id = b.key.slice(6);
+    if (have.has(id)) continue;
+    const d = await s.get(b.key, { type: "json" });
+    if (d) { idx.dreams.unshift(summary(d)); changed = true; }
+  }
+  if (changed) await s.setJSON("index", idx);
+}
+
 export async function deletePhotos(s, id, count) {
   for (let n = 0; n < (count || 6); n++) {
     await s.delete(`photo/${id}/${n}`);

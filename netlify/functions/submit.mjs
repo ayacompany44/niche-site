@@ -1,4 +1,5 @@
-import { store, json, CATS, IG_RE } from "../lib/store.mjs";
+import { store, json, CATS, IG_RE, upsertIndex } from "../lib/store.mjs";
+import { findProfanity } from "../lib/filter.mjs";
 
 const MAX_BODY = 5_500_000;      // limite Netlify : 6 Mo par requête
 const MAX_PHOTOS = 6;
@@ -16,7 +17,7 @@ function decodeJpeg(dataUrl, max) {
   return buf;
 }
 
-// POST /api/submit — un nouveau rêve, toujours en attente de validation
+// POST /api/submit — un nouveau rêve : publié tout de suite, sauf s'il contient des vulgarités (→ modération)
 export default async (req) => {
   const len = Number(req.headers.get("content-length") || 0);
   if (len > MAX_BODY) return json({ error: "Envoi trop lourd. Retire une ou deux photos." }, 413);
@@ -56,12 +57,27 @@ export default async (req) => {
     await s.set(`photo/${id}/${n}`, photos[n].full);
     await s.set(`photo/${id}/${n}-t`, photos[n].thumb);
   }
-  await s.setJSON(`sub/${id}`, {
-    id, title, story, category, author, instagram, anonymous,
-    consentText: true, consentPhotos: photos.length > 0, consentPrivacy: true,
-    photoCount: photos.length, createdAt: new Date().toISOString(),
-  });
-  return json({ ok: true, id }, 201);
+  const createdAt = new Date().toISOString();
+  const flagged = findProfanity(title, story, author, instagram);
+
+  if (flagged.length) {
+    await s.setJSON(`sub/${id}`, {
+      id, title, story, category, author, instagram, anonymous, flagged,
+      consentText: true, consentPhotos: photos.length > 0, consentPrivacy: true,
+      photoCount: photos.length, createdAt,
+    });
+    return json({ ok: true, id, status: "pending" }, 201);
+  }
+
+  const dream = {
+    id, title, story, category,
+    author: anonymous ? "" : author, instagram: anonymous ? "" : instagram, anonymous,
+    photoCount: photos.length, featured: false, example: false,
+    submittedAt: createdAt, publishedAt: createdAt,
+  };
+  await s.setJSON(`dream/${id}`, dream);
+  await upsertIndex(s, dream);
+  return json({ ok: true, id, status: "published" }, 201);
 };
 
 export const config = { path: "/api/submit", method: "POST" };

@@ -492,21 +492,23 @@ $("#form").addEventListener("submit", async e => {
   if (first) { first.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"center"}); return; }
   const btn = $("#send"), es = $("#e-send"); es.hidden = true; btn.disabled = true; btn.textContent = "Envoi en cours…";
   try {
-    await api.submit({ title, story, category:cat, author:F.name.value.trim(), instagram:ig, anonymous:F.anon.checked,
+    const res = await api.submit({ title, story, category:cat, author:F.name.value.trim(), instagram:ig, anonymous:F.anon.checked,
       consentText:true, consentPhotos:$("#c-img").checked, consentPrivacy:true, website:$("#f-website").value,
       elapsed: Date.now() - S.openedAt, photos:S.photos.map(p => ({full:p.full, thumb:p.thumb})) });
     $("#form").reset(); S.photos = []; thumbs(); $("#c-title").textContent = "0 / 110"; $("#c-story").textContent = "0 / 5000"; $("#anonLbl").textContent = "Mon nom sera visible"; prog();
-    done();
+    done(res);
+    if (res && res.status === "published") load();
   } catch (err) {
     es.textContent = err.status ? err.message : "L'envoi n'a pas abouti. Vérifie ta connexion et réessaie : ton texte est toujours là.";
     es.hidden = false;
   } finally { btn.disabled = false; btn.textContent = "Envoyer mon rêve →"; }
 });
-function done() {
+function done(res) {
   share.classList.add("done"); $("#formView").hidden = true;
   const d = $("#doneView"); d.hidden = false;
-  d.innerHTML = `<section class="done-box wrap"><span class="mono">Envoyé · en attente de validation</span><h2 id="doneT">Ton rêve a trouvé <span class="it">sa place.</span></h2><p>Merci de nous avoir confié une petite partie de ton univers.</p><span class="slogan">No dream is too niche.</span>
-    <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn solid" href="#archive">Explorer l'archive</a><button class="btn" type="button" id="again">Partager un autre rêve</button></div></section>`;
+  const live = res && res.status === "published" && ID_RE.test(res.id || "");
+  d.innerHTML = `<section class="done-box wrap"><span class="mono">${live ? "Publié · en ligne maintenant" : "Bien reçu · relecture avant publication"}</span><h2 id="doneT">Ton rêve a trouvé <span class="it">sa place.</span></h2><p>${live ? "Merci de nous avoir confié une petite partie de ton univers." : "Il contient des mots que l'on relit avant de publier. Il apparaîtra dès qu'il sera validé."}</p><span class="slogan">No dream is too niche.</span>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">${live ? `<a class="btn solid" href="#reve-${esc(res.id)}">Voir mon rêve →</a><a class="btn" href="#archive">Explorer l'archive</a>` : `<a class="btn solid" href="#archive">Explorer l'archive</a>`}<button class="btn" type="button" id="again">Partager un autre rêve</button></div></section>`;
   const t = $("#doneT"); split(t); replay(t);
   $("#again").onclick = () => { share.classList.remove("done"); $("#formView").hidden = false; d.hidden = true; S.openedAt = Date.now(); share.scrollTo(0, 0); };
   share.scrollTo(0, 0);
@@ -532,13 +534,13 @@ async function renderMod() {
 function logout() { S.adminKey = ""; try { sessionStorage.removeItem("niche-admin"); } catch {} renderMod(); }
 function paintMod() {
   const box = $("#mod"), tab = S.modTab;
-  const tabs = `<div class="tabs"><button class="chip" data-tab="pending" aria-pressed="${tab === "pending"}">En attente (${S.subs.length})</button><button class="chip" data-tab="pub" aria-pressed="${tab === "pub"}">Publiés (${S.dreams.length})</button><button class="chip" data-tab="out">Se déconnecter</button></div>`;
+  const tabs = `<div class="tabs"><button class="chip" data-tab="pending" aria-pressed="${tab === "pending"}">Mis de côté (${S.subs.length})</button><button class="chip" data-tab="pub" aria-pressed="${tab === "pub"}">Publiés (${S.dreams.length})</button><button class="chip" data-tab="out">Se déconnecter</button></div>`;
   let body;
   if (tab === "pending") body = S.subs.length ? S.subs.map(s => `<div class="mod-item" data-id="${esc(s.id)}">
-      <div style="min-width:0"><div class="kv mono"><span>${esc(catLabel(s.category))}</span><span>Reçu le ${esc(fmtDate(s.createdAt))}</span><span>${s.anonymous ? "Anonyme" : esc(s.author || "Sans nom")}${!s.anonymous && s.instagram ? " · @" + esc(s.instagram) : ""}</span><span>${s.photoCount} photo(s)</span></div>
+      <div style="min-width:0"><div class="kv mono"><span>${esc(catLabel(s.category))}</span><span>Reçu le ${esc(fmtDate(s.createdAt))}</span><span>${s.anonymous ? "Anonyme" : esc(s.author || "Sans nom")}${!s.anonymous && s.instagram ? " · @" + esc(s.instagram) : ""}</span><span>${s.photoCount} photo(s)</span>${s.flagged && s.flagged.length ? `<span class="badge" style="color:var(--y)">Mots repérés : ${esc(s.flagged.join(", "))}</span>` : ""}</div>
       <h3>${esc(s.title)}</h3><p class="st">${esc(s.story)}</p><div class="pics" data-pics="${s.photoCount}"></div></div>
       <div class="acts"><button class="btn solid" data-act="approve" type="button">Publier</button><button class="btn" data-act="approve-feat" type="button">Publier à la une</button><button class="btn" data-act="reject" type="button">${S.confirm === s.id ? "Confirmer le refus" : "Refuser"}</button></div></div>`).join("")
-    : `<div class="empty"><h3>Rien à valider.</h3><p>Les nouveaux rêves envoyés apparaîtront ici.</p></div>`;
+    : `<div class="empty"><h3>Rien de mis de côté.</h3><p>Les rêves publiés passent directement en ligne. Ceux qui contiennent des mots vulgaires arrivent ici, et tu choisis de les publier ou non.</p></div>`;
   else body = S.dreams.length ? S.dreams.map(d => `<div class="mod-item" data-id="${esc(d.id)}">
       <div style="min-width:0"><div class="kv mono"><span>${esc(catLabel(d.category))}</span><span>${esc(fmtDate(d.publishedAt))}</span>${d.example ? `<span class="badge">Exemple</span>` : ""}${d.featured ? `<span class="badge">À la une</span>` : ""}</div><h3><a href="#reve-${esc(d.id)}" style="text-decoration:none">${esc(d.title)}</a></h3></div>
       <div class="acts"><button class="btn" data-act="feature" type="button">${d.featured ? "Retirer de la une" : "Mettre à la une"}</button><button class="btn" data-act="remove" type="button">${S.confirm === d.id ? "Confirmer le retrait" : "Retirer du site"}</button></div></div>`).join("")

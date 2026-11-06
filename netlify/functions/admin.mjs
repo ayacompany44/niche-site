@@ -1,4 +1,4 @@
-import { store, json, isAdmin, adminConfigured, getIndex, summary, deletePhotos, ID_RE } from "../lib/store.mjs";
+import { store, json, isAdmin, adminConfigured, getIndex, summary, deletePhotos, upsertIndex, repairIndex, ID_RE } from "../lib/store.mjs";
 
 // POST /api/admin — modération, protégée par la variable d'environnement ADMIN_PASSWORD
 export default async (req) => {
@@ -15,6 +15,7 @@ export default async (req) => {
       return json({ ok: true });
 
     case "pending": {
+      await repairIndex(s);
       const { blobs } = await s.list({ prefix: "sub/" });
       const subs = [];
       for (const bl of blobs) { const v = await s.get(bl.key, { type: "json" }); if (v) subs.push(v); }
@@ -32,9 +33,7 @@ export default async (req) => {
         submittedAt: sub.createdAt, publishedAt: new Date().toISOString(),
       };
       await s.setJSON(`dream/${id}`, dream);
-      const idx = await getIndex(s);
-      idx.dreams = [summary(dream), ...idx.dreams.filter((d) => d.id !== id)];
-      await s.setJSON("index", idx);
+      await upsertIndex(s, dream);
       await s.delete(`sub/${id}`);
       return json({ ok: true });
     }
@@ -51,9 +50,7 @@ export default async (req) => {
       if (!d) return json({ error: "Rêve introuvable." }, 404);
       d.featured = !d.featured;
       await s.setJSON(`dream/${id}`, d);
-      const idx = await getIndex(s);
-      idx.dreams = idx.dreams.map((x) => (x.id === id ? summary(d) : x));
-      await s.setJSON("index", idx);
+      await upsertIndex(s, d);
       return json({ ok: true, featured: d.featured });
     }
 
