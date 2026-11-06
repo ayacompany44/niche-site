@@ -17,7 +17,7 @@ function decodeJpeg(dataUrl, max) {
   return buf;
 }
 
-// POST /api/submit — un nouveau rêve : publié tout de suite, sauf s'il contient des vulgarités (→ modération)
+// POST /api/submit — un nouveau rêve : publié tout de suite s'il n'a ni photo ni vulgarité ; sinon → modération
 export default async (req) => {
   const len = Number(req.headers.get("content-length") || 0);
   if (len > MAX_BODY) return json({ error: "Envoi trop lourd. Retire une ou deux photos." }, 413);
@@ -60,13 +60,14 @@ export default async (req) => {
   const createdAt = new Date().toISOString();
   const flagged = findProfanity(title, story, author, instagram);
 
-  if (flagged.length) {
+  if (flagged.length || photos.length) {
+    const reason = flagged.length ? "words" : "photos";
     await s.setJSON(`sub/${id}`, {
-      id, title, story, category, author, instagram, anonymous, flagged,
+      id, title, story, category, author, instagram, anonymous, flagged, reason,
       consentText: true, consentPhotos: photos.length > 0, consentPrivacy: true,
       photoCount: photos.length, createdAt,
     });
-    return json({ ok: true, id, status: "pending" }, 201);
+    return json({ ok: true, id, status: "pending", reason }, 201);
   }
 
   const dream = {
